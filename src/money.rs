@@ -5,6 +5,7 @@ use crate::MoneyError;
 
 use std::cmp::Ordering;
 use std::fmt;
+use std::iter::Sum;
 use std::ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign};
 use std::str::FromStr;
 
@@ -15,7 +16,7 @@ use rust_decimal::Decimal;
 /// Money represents financial amounts through a Decimal (owned) and a Currency (reference).
 /// Operations on Money objects always create new instances of Money, with the exception
 /// of `round()`.
-#[derive(Debug, PartialEq, Eq, Clone, Copy)]
+#[derive(Debug, PartialEq, Eq, Clone, Copy, Hash)]
 pub struct Money<T: FormattableCurrency> {
     amount: Decimal,
     currency: T,
@@ -74,6 +75,16 @@ impl<T: FormattableCurrency> Neg for Money<T> {
             amount: -self.amount,
             currency: self.currency,
         }
+    }
+}
+
+impl<T: FormattableCurrency> Sum<Money<T>> for Money<T> {
+    fn sum<I>(mut iter: I) -> Self
+    where
+        I: Iterator<Item = Money<T>>,
+    {
+        let initial = iter.next().unwrap();
+        iter.fold(initial, |acc, x| acc + x)
     }
 }
 
