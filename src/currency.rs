@@ -134,14 +134,14 @@ mod tests {
       },
       magic {
         FOO: {
-            code: "FOO",
-            exponent: 3,
-            locale: EnUs,
-            minor_units: 100,
-            name: "FOO",
-            symbol: "F",
-            symbol_first: true,
-          }
+          code: "FOO",
+          exponent: 3,
+          locale: EnUs,
+          minor_units: 100,
+          name: "FOO",
+          symbol: "F",
+          symbol_first: true,
+        }
       }
     );
 
