@@ -429,6 +429,15 @@ mod tests {
                 name: "United Arab Emirates Dirham",
                 symbol: "د.إ",
                 symbol_first: false,
+            },
+            ETH: {
+                code: "ETH",
+                exponent: 18,
+                locale: EnUs,
+                minor_units: 1_000_000_000_000_000_000,
+                name: "Ethereum",
+                symbol: "ETH",
+                symbol_first: false,
             }
         }
     );
@@ -524,6 +533,25 @@ mod tests {
     }
 
     #[test]
+    fn money_from_string_parses_cryptocurrency() {
+        assert_eq!(
+            Money::from_decimal("1.11111111111".parse().unwrap(), test::ETH),
+            Money::from_str("1.11111111111", test::ETH).unwrap()
+        );
+
+        assert_eq!(
+            Money::from_decimal(
+                Decimal::from_i128_with_scale(
+                    "40891626854930000000000".parse::<i128>().unwrap(),
+                    test::ETH.exponent()
+                ),
+                test::ETH,
+            ),
+            Money::from_str("40891626854930000000000", test::ETH).unwrap()
+        );
+    }
+
+    #[test]
     fn money_format_rounds_exponent() {
         // // 19.999 rounds to 20 for USD
         let money = Money::from_str("19.9999", test::USD).unwrap();
@@ -545,10 +573,22 @@ mod tests {
             Money::from_major(2, test::USD),
             Money::from_major(1, test::USD) + Money::from_major(1, test::USD)
         );
+        assert_eq!(
+            Money::from_decimal("3.33333333333".parse().unwrap(), test::ETH),
+            Money::from_decimal("1.11111111111".parse().unwrap(), test::ETH)
+                + Money::from_decimal("2.22222222222".parse().unwrap(), test::ETH)
+        );
+
         // Subtraction
         assert_eq!(
             Money::from_major(0, test::USD),
             Money::from_major(1, test::USD) - Money::from_major(1, test::USD)
+        );
+
+        assert_eq!(
+            Money::from_decimal("-1.11111111111".parse().unwrap(), test::ETH),
+            Money::from_decimal("1.11111111111".parse().unwrap(), test::ETH)
+                - Money::from_decimal("2.22222222222".parse().unwrap(), test::ETH)
         );
     }
 
