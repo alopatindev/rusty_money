@@ -214,8 +214,8 @@ impl<T: FormattableCurrency> Money<T> {
     /// Creates a Money object given an integer and a currency reference.
     ///
     /// The integer represents minor units of the currency (e.g. 1000 -> 10.00 in USD )
-    pub fn from_minor(amount: i64, currency: T) -> Money<T> {
-        let amount = Decimal::new(amount, currency.exponent());
+    pub fn from_minor(amount: i128, currency: T) -> Money<T> {
+        let amount = Decimal::from_i128_with_scale(amount, currency.exponent());
         Money { amount, currency }
     }
 
@@ -448,6 +448,23 @@ mod tests {
         let major_usd = Money::from_major(10, test::USD);
         let minor_usd = Money::from_minor(1000, test::USD);
         assert_eq!(major_usd, minor_usd);
+    }
+
+    #[test]
+    fn money_from_minor_cryptocurrency() {
+        assert_eq!(
+            Money::from_decimal(
+                Decimal::from_i128_with_scale(
+                    "40891626854930000000000".parse::<i128>().unwrap(),
+                    test::ETH.exponent()
+                ),
+                test::ETH,
+            ),
+            Money::from_minor(
+                "40891626854930000000000".parse::<i128>().unwrap(),
+                test::ETH
+            )
+        );
     }
 
     #[test]
